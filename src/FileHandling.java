@@ -43,12 +43,12 @@ public class FileHandling {
 					j++;
 					i++;
 				}
-				j=0;
+				
 				//System.out.println();
 				DataPage dWrite = new DataPage(insToWrite, sizeOfIns);
-				bb.put(dWrite.convertToByte(),0,dWrite.convertToByte().length);
-				//bb.putInt(PAGE_SIZE-4,lengthOf);
-	
+				bb.put(dWrite.convertToByte(),0,(numOfInstances*sizeOfIns)-4);
+				bb.putInt(numOfInstances * sizeOfIns,j);
+				j=0;
 				/*try{
 					bb.putInt(PAGE_SIZE-4,dWrite.getNumOfRecords());
 				}catch(Exception e){
@@ -84,17 +84,22 @@ public class FileHandling {
 
 			DataClass[] dcArr = new DataClass[recsToRead];
 			file.seek(0);//we are going to read from the beggining
-			//System.out.println("DEBUG filesize: "+fileSize);
-			//System.out.println("DEBUG read recs "+recsToRead);
-
-			byte[] buffer = new byte[PAGE_SIZE]; //in this buffer we read the page and then modification takes in
+			int curPage = (maxInstances*insSize);
+			byte[] buffer = new byte[insSize]; //in this buffer we read the page and then modification takes in
 			ByteBuffer bb = ByteBuffer.wrap(buffer);
 			for (int i=0; i<fileSize/PAGE_SIZE; i++){
-				System.out.println("DEBUG num Of pages "+i);
-				bb.clear();
-				file.read(buffer);
-				bb.put(buffer);
-				dpArr[i]=DataPage.convertToPage(buffer, insSize);
+				file.seek((i*PAGE_SIZE)+curPage);
+				int recsInPage=file.readInt();
+				System.out.println(recsInPage);
+				
+				for (int j=0; j<recsInPage;j++){
+					file.seek(seekPos);
+					file.read(buffer);
+					dcArr[j]=DataClass.convertToObj(buffer, insSize);
+					System.out.println("DEBUG readPages: "+dcArr[j].toString()+" seekPos: "+seekPos);
+					seekPos+=insSize;
+				}
+				seekPos=(i+1)*PAGE_SIZE;
 			}
 			/*System.out.println(file.readInt());
 			file.seek(4);

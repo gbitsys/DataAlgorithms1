@@ -3,8 +3,8 @@ import java.util.*;
 public class RandomGenerator {
 	
 	//bounds of ASCII characters we use
-	private static int LowerASCII=33;
-	private static int UpperASCII=126;
+	private static int LowerASCII=48;
+	private static int UpperASCII=90;
 	private static int A_SIZE=55;
 	private static StringBuilder strBuilder;
 	private String dataStr;

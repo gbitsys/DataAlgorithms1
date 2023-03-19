@@ -32,11 +32,10 @@ public class DataClass implements Comparable{
 
 	//method that takes a byte array and converts it into an Object of DataClass
 	public static DataClass convertToObj(byte[] bArray, int size) {
-		byte[] buffer=new byte[size]; // read from disk
-		ByteBuffer bb = ByteBuffer.wrap(buffer);
+		ByteBuffer bb = ByteBuffer.wrap(bArray);
 		int key = bb.getInt(); //position moves 4 bytes to the front
 		byte byteArray[] = new byte[size-4];
-		bb.get(byteArray);
+		byteArray = bb.get(bArray,4,size-4).array();
 		String dataString = new String(byteArray, java.nio.charset.StandardCharsets.US_ASCII);
 		DataClass dc = new DataClass(key, dataString);
 		//System.out.println("DEBUG convToObj :"+dc.toString()+" size: "+size);

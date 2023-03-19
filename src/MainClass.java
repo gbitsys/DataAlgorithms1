@@ -13,9 +13,9 @@ public class MainClass {
 	private static final int DATA_SIZEB=27;
 	private static final int KEY_SIZE=4;
 	public static void main(String[] args) {
-		DataClass[] dcArr = generateDataClasses(5, DATA_SIZEA);
+		DataClass[] dcArr = generateDataClasses(6, DATA_SIZEA);
 		System.out.println("Write Page: "+FileHandling.writePage(dcArr, "file1.bin", DC_SIZEA));
-		System.out.println(FileHandling.readPages("file1.bin",DC_SIZEA)[0].getRecords()[0].toString());
+		FileHandling.readPages("file1.bin",DC_SIZEA);
 
 	
 		ByteBuffer bb = ByteBuffer.allocate(256);
