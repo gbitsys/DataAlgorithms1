@@ -39,9 +39,32 @@ public class DataClass implements Comparable{
 		bb.get(byteArray);
 		String dataString = new String(byteArray, java.nio.charset.StandardCharsets.US_ASCII);
 		DataClass dc = new DataClass(key, dataString);
+		//System.out.println("DEBUG convToObj :"+dc.toString()+" size: "+size);
 		return dc;
 		}
+	
+	public static byte[] convertToByte(DataClass dc){
+		ByteBuffer bb = ByteBuffer.allocate(dc.getDataString().length()+4);
+		int someInt = dc.getKey();
+		String someString = dc.getDataString();
+		bb.putInt(someInt);
+		bb.put(someString.getBytes(java.nio.charset.StandardCharsets.US_ASCII));
+		return bb.array();
+	}
 
+	/*public static byte[] extracted(DataClass[] dcArr, int dataSize) {
+		ByteBuffer bb = ByteBuffer.allocate(dcArr.length*dataSize);
+        for (DataClass dc : dcArr){
+            if (dc!=null){
+                bb.putInt(dc.getKey());
+                bb.put(dc.getDataString().getBytes(java.nio.charset.StandardCharsets.US_ASCII));
+				//System.out.println("DEBUG DC "+dc.toString()+" mark "+bb.mark());
+            }
+        }
+		
+		System.out.println("DEBUG extracted:  ");
+        return bb.array();
+    }*/
 
 	//getters and setters
 	public int getKey() {

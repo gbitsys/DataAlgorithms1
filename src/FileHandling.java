@@ -1,6 +1,9 @@
 import java.io.*;
+import java.lang.module.ModuleDescriptor.Builder;
 import java.nio.*;
-import java.util.Scanner;
+import java.util.ArrayList;
+import java.util.*;
+
 
 
 public class FileHandling {
@@ -19,58 +22,88 @@ public class FileHandling {
 		this.fName = fileName;
 	}
 
-	public static void writePage(DataClass[] dcInstances, String fName, int sizeOfIns) {
+	public static int writePage(DataClass[] dcInstances, String fName, int sizeOfIns) {
 
 
-		try (RandomAccessFile file = new RandomAccessFile(fName, "rw")) {
+		try (RandomAccessFile file = new RandomAccessFile(fName, "rws")) {
 			int lengthOf = dcInstances.length;
 			int numOfBytes = lengthOf*sizeOfIns;
 			int toWrite = (int) Math.ceil((double)numOfBytes/PAGE_SIZE); //how many pages we want
 			ByteBuffer bb = ByteBuffer.allocate(PAGE_SIZE);
 			int numOfInstances = (int) ((double)PAGE_SIZE/sizeOfIns); //for grouping instances
-			
+			file.setLength((toWrite+4));
 			int i=0;
 			int j=0;
-			System.out.println("DEBUG: "+numOfBytes + " " + numOfInstances);//DEBUG
+			//System.out.println("DEBUG: "+numOfBytes + " " + numOfInstances);//DEBUG
 			for(int p=0; p<toWrite; p++){
 				bb.clear();
-				System.out.println("DEBUG 1 Loop");
 				DataClass[] insToWrite = new DataClass[numOfInstances];
 				while (i<lengthOf && (numOfInstances-j)>0){
-					System.out.println("DEBUG 2 Loop");
 					insToWrite[j]=dcInstances[i];
 					j++;
 					i++;
 				}
 				j=0;
-				System.out.println();
-				bb.put(new DataPage(insToWrite, sizeOfIns).convertToByte());
-				System.out.println(bb.mark());
+				//System.out.println();
+				DataPage dWrite = new DataPage(insToWrite, sizeOfIns);
+				bb.put(dWrite.convertToByte(),0,dWrite.convertToByte().length);
+				//bb.putInt(PAGE_SIZE-4,lengthOf);
+	
+				/*try{
+					bb.putInt(PAGE_SIZE-4,dWrite.getNumOfRecords());
+				}catch(Exception e){
+
+				}*/
+
 				file.write(bb.array());
 			}
+			System.out.println("DEBUG write file bytes: "+file.length());
+			int fileBytes = (int)file.length();
+			file.seek(fileBytes-4);
+			file.writeInt(lengthOf);
+			file.close();
+			return toWrite;
+			
 		} catch (IOException e) { //case something wrong happens with our file
 			System.out.println("File errror!!!");
 			e.printStackTrace();
+			return -1;
 		}
 	}
-	
-	public static DataPage[] readPages(String filename, int sizeOfRec, int sizeOfIns) {
+	//reading whole page and returns every Page in an array
+	public static DataPage[] readPages(String filename, int insSize) {
 		try (RandomAccessFile file = new RandomAccessFile(filename, "r")) {
-			byte[] buffer = new byte[PAGE_SIZE]; // read from disk
+			int fileSize = (int) file.length(); //multiple of page size
+			int maxInstances = (int) ((double)PAGE_SIZE/insSize); //max num of instaces
+ 			int numOfPages = fileSize/256; //num of pages written in the file
+			int seekPos=0; //our cursor position for reading  purposes
+			DataPage[] dpArr = new DataPage[fileSize/PAGE_SIZE];
+
+			file.seek(fileSize-4);
+			int recsToRead = file.readInt(); //recs we want to read given from file at 4 last bytes
+
+			DataClass[] dcArr = new DataClass[recsToRead];
+			file.seek(0);//we are going to read from the beggining
+			//System.out.println("DEBUG filesize: "+fileSize);
+			//System.out.println("DEBUG read recs "+recsToRead);
+
+			byte[] buffer = new byte[PAGE_SIZE]; //in this buffer we read the page and then modification takes in
 			ByteBuffer bb = ByteBuffer.wrap(buffer);
-			int recsToRead = (int) Math.floor((double)PAGE_SIZE/sizeOfRec); //max recs 
-			int recs = 1;
-			while (recs>0){
-				file.seek(PAGE_SIZE-4); //moving the cursor to read how many recs we have in this DataPage
-				recs=file.readInt();
-				for (int i=0; i<recs; i++){
-					file.seek(i*sizeOfIns);
-					file.read(buffer,0,sizeOfIns);
-					DataClass.convertToObj(buffer, sizeOfIns);
-				}
+			for (int i=0; i<fileSize/PAGE_SIZE; i++){
+				System.out.println("DEBUG num Of pages "+i);
+				bb.clear();
+				file.read(buffer);
+				bb.put(buffer);
+				dpArr[i]=DataPage.convertToPage(buffer, insSize);
 			}
-			
-			return null;
+			/*System.out.println(file.readInt());
+			file.seek(4);
+			file.read(buffer);
+			bb.get(buffer);
+			String  man = new String(buffer, java.nio.charset.StandardCharsets.US_ASCII);
+			System.out.println(man);
+			*/
+			return dpArr;
 		} catch (IOException e) { //case something wrong happens with our file
 			System.out.println("File errror!!!");
 			return null;

@@ -4,17 +4,25 @@ import java.util.*;
 public class DataPage{
 
     private static final int sizeBytes=256;
-    private int numOfRecords; //4 bytes size
+    private int BytesOfRecords; //4 bytes size
     private DataClass[] records; //= new DataClass[4]; // number of records depends on size of the records
     private int sizeOfIns;
 
     public DataPage(DataClass[] records, int sizeOfIns) {
         this.records = records;
-        this.numOfRecords = records.length;
+        this.BytesOfRecords = records.length;
         this.sizeOfIns=sizeOfIns;
-        if (sizeOfIns<numOfRecords){
+        if (sizeOfIns<BytesOfRecords){
             System.out.println("Overflow");
         }
+    }
+
+    public DataPage() {
+    }
+
+    @Override
+    public String toString(){
+        return ("numOfRecords :"+this.BytesOfRecords+" record 1: "+records[0].toString());
     }
 
     public byte[] convertToByte(){
@@ -33,13 +41,55 @@ public class DataPage{
         bb.putInt(numOfInstances);
         return bb.array();
     }
+
+    public static DataPage convertToPage(byte[] DataPage, int sizeOfRec){
+        ByteBuffer bb = ByteBuffer.allocate(sizeOfRec);//byte buffer for records
+        int numOfInstances = (int) ((double)sizeBytes/sizeOfRec); //for grouping instances
+        DataClass[] dcArr = new DataClass[numOfInstances];
+        DataPage dpReturn=new DataPage();
+        int j=0;
+        for(int i=0; i<sizeOfRec*numOfInstances; i+=sizeOfRec){
+            bb.clear();
+            System.out.println("DataPage DEBUG i: "+i+" length: "+DataPage.length+" mark "+bb.mark());
+            bb.put(DataPage,0,sizeOfRec);
+            //checking if null
+            
+            dcArr[j] = DataClass.convertToObj(bb.array(), sizeOfRec);
+            //System.out.println(dcArr[j].toString());
+            j++;
+        }
+        return new DataPage(dcArr, sizeOfRec);
+        
+        /* 
+        byte[] buffer=new byte[size]; // read from disk
+		ByteBuffer bb = ByteBuffer.wrap(buffer);
+		int key = bb.getInt(); //position moves 4 bytes to the front
+		byte byteArray[] = new byte[size-4];
+		bb.get(byteArray);
+		String dataString = new String(byteArray, java.nio.charset.StandardCharsets.US_ASCII);
+		DataClass dc = new DataClass(key, dataString);
+		return dc;*/
+        
+    }
     
+    public void setBytesOfRecords(int bytesOfRecords) {
+        BytesOfRecords = bytesOfRecords;
+    }
+
+    public void setRecords(DataClass[] records) {
+        this.records = records;
+    }
+
+    public void setSizeOfIns(int sizeOfIns) {
+        this.sizeOfIns = sizeOfIns;
+    }
+
     public DataClass[] getRecords(){
         return this.records;
     }
 
-    public int getNumOfRecords(){
-        return this.numOfRecords;
+    public int getBytesOfRecords(){
+        return this.BytesOfRecords;
     }
 
 }
