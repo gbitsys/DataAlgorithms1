@@ -14,8 +14,11 @@ public class MainClass {
 	private static final int KEY_SIZE=4;
 	public static void main(String[] args) {
 		DataClass[] dcArr = generateDataClasses(6, DATA_SIZEA);
-		System.out.println("Write Page: "+FileHandling.writePage(dcArr, "file1.bin", DC_SIZEA));
-		FileHandling.readPages("file1.bin",DC_SIZEA);
+		DataPage[] dPages = new DataPage[2];
+		FileHandling.writePage(dcArr, "file1.bin", DC_SIZEA);
+		dPages = FileHandling.readPages("file1.bin",DC_SIZEA);
+		System.out.println();
+		System.out.println(dPages[0].getRecords()[0].toString());
 
 	
 		ByteBuffer bb = ByteBuffer.allocate(256);
@@ -28,7 +31,6 @@ public class MainClass {
 		*/
 	}
 
-
 	// a method that generates our DataClasses and puts them into an array
 	public static DataClass[] generateDataClasses(int numOfClasses, int size){
 		DataClass[] dcArr = new DataClass[numOfClasses];
@@ -36,7 +38,7 @@ public class MainClass {
 		randomUniqKeys = RandomGenerator.generateInts(numOfClasses, 0, numOfClasses*2);
 
 		for (int i=0; i<numOfClasses; i++){
-			dcArr[i] = new DataClass(randomUniqKeys[i], RandomGenerator.generateASCII(size));
+			dcArr[i] = new DataClass(randomUniqKeys[i], RandomGenerator.generateGeek(size));
 		}
 
 

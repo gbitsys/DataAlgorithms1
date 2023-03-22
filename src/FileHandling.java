@@ -57,7 +57,7 @@ public class FileHandling {
 
 				file.write(bb.array());
 			}
-			System.out.println("DEBUG write file bytes: "+file.length());
+			//System.out.println("DEBUG write file bytes: "+file.length());
 			int fileBytes = (int)file.length();
 			file.seek(fileBytes-4);
 			file.writeInt(lengthOf);
@@ -75,9 +75,11 @@ public class FileHandling {
 		try (RandomAccessFile file = new RandomAccessFile(filename, "r")) {
 			int fileSize = (int) file.length(); //multiple of page size
 			int maxInstances = (int) ((double)PAGE_SIZE/insSize); //max num of instaces
- 			int numOfPages = fileSize/256; //num of pages written in the file
+ 			int numOfPages = fileSize/PAGE_SIZE; //num of pages written in the file
 			int seekPos=0; //our cursor position for reading  purposes
-			DataPage[] dpArr = new DataPage[fileSize/PAGE_SIZE];
+			byte[] buffer = new byte[insSize]; //in this buffer we read the page and then modification takes in
+			ByteBuffer bb = ByteBuffer.wrap(buffer);
+			DataPage[] dpArr = new DataPage[numOfPages];
 
 			file.seek(fileSize-4);
 			int recsToRead = file.readInt(); //recs we want to read given from file at 4 last bytes
@@ -85,29 +87,21 @@ public class FileHandling {
 			DataClass[] dcArr = new DataClass[recsToRead];
 			file.seek(0);//we are going to read from the beggining
 			int curPage = (maxInstances*insSize);
-			byte[] buffer = new byte[insSize]; //in this buffer we read the page and then modification takes in
-			ByteBuffer bb = ByteBuffer.wrap(buffer);
-			for (int i=0; i<fileSize/PAGE_SIZE; i++){
+			for (int i=0; i<numOfPages; i++){
 				file.seek((i*PAGE_SIZE)+curPage);
 				int recsInPage=file.readInt();
-				System.out.println(recsInPage);
-				
+				//System.out.println(recsInPage);
 				for (int j=0; j<recsInPage;j++){
 					file.seek(seekPos);
 					file.read(buffer);
 					dcArr[j]=DataClass.convertToObj(buffer, insSize);
-					System.out.println("DEBUG readPages: "+dcArr[j].toString()+" seekPos: "+seekPos);
+					//System.out.println("DEBUG readPages: "+dcArr[j].toString()+" seekPos: "+seekPos);
 					seekPos+=insSize;
 				}
 				seekPos=(i+1)*PAGE_SIZE;
+				dpArr[i] = new DataPage(dcArr, insSize);
 			}
-			/*System.out.println(file.readInt());
-			file.seek(4);
-			file.read(buffer);
-			bb.get(buffer);
-			String  man = new String(buffer, java.nio.charset.StandardCharsets.US_ASCII);
-			System.out.println(man);
-			*/
+
 			return dpArr;
 		} catch (IOException e) { //case something wrong happens with our file
 			System.out.println("File errror!!!");

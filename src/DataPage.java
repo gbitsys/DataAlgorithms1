@@ -60,16 +60,6 @@ public class DataPage{
         }
         return new DataPage(dcArr, sizeOfRec);
         
-        /* 
-        byte[] buffer=new byte[size]; // read from disk
-		ByteBuffer bb = ByteBuffer.wrap(buffer);
-		int key = bb.getInt(); //position moves 4 bytes to the front
-		byte byteArray[] = new byte[size-4];
-		bb.get(byteArray);
-		String dataString = new String(byteArray, java.nio.charset.StandardCharsets.US_ASCII);
-		DataClass dc = new DataClass(key, dataString);
-		return dc;*/
-        
     }
     
     public void setBytesOfRecords(int bytesOfRecords) {

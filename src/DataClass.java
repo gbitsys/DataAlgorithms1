@@ -27,7 +27,7 @@ public class DataClass implements Comparable{
 
 	@Override
 	public String toString(){
-		return ("key: "+ this.key+" data: "+this.dataStr);
+		return ("key :"+ this.key+" data: "+this.dataStr);
 	}
 
 	//method that takes a byte array and converts it into an Object of DataClass

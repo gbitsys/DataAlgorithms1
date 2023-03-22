@@ -9,6 +9,9 @@ public class RandomGenerator {
 	private static StringBuilder strBuilder;
 	private String dataStr;
 	private static Random randomGenerator = new Random();
+	private static String AlphaNumericString = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+	+ "0123456789"
+	+ "abcdefghijklmnopqrstuvxyz";
 	
 	
 	public RandomGenerator() {
@@ -22,6 +25,22 @@ public class RandomGenerator {
 			strBuilder.append((char)num[i]);
 		}
 		return strBuilder.toString();
+	}
+
+	public static String generateGeek(int size){
+		StringBuilder sb = new StringBuilder();
+		for (int i = 0; i < size; i++) {
+ 
+			// generate a random number between
+			// 0 to AlphaNumericString variable length
+			int index = (int)(AlphaNumericString.length()* Math.random());
+		  
+			// add Character one by one in end of sb
+			sb.append(AlphaNumericString.charAt(index));
+		   }
+		  
+		   return sb.toString();
+		  
 	}
 
 	// a method that generates an array of unique random integers
