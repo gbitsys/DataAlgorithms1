@@ -16,9 +16,13 @@ public class MainClass {
 		DataClass[] dcArr = generateDataClasses(6, DATA_SIZEA);
 		DataPage[] dPages = new DataPage[2];
 		FileHandling.writePage(dcArr, "file1.bin", DC_SIZEA);
-		dPages = FileHandling.readPages("file1.bin",DC_SIZEA);
 		System.out.println();
-		System.out.println(dPages[0].getRecords()[0].toString());
+		//System.out.println(dPages[0].getRecords()[0].toString());
+		int [] keysSearch = new int[6];
+		keysSearch = RandomGenerator.generateInts(6, 0, 2*6);
+		for (int i=0; i<6; i++){
+			System.out.println(FileHandling.searchKeyFile("file1.bin", DC_SIZEA, keysSearch[i]));
+		}
 
 	
 		ByteBuffer bb = ByteBuffer.allocate(256);

@@ -4,15 +4,15 @@ import java.util.*;
 public class DataPage{
 
     private static final int sizeBytes=256;
-    private int BytesOfRecords; //4 bytes size
+    private int bytesOfRecords; //4 bytes size
     private DataClass[] records; //= new DataClass[4]; // number of records depends on size of the records
     private int sizeOfIns;
 
     public DataPage(DataClass[] records, int sizeOfIns) {
         this.records = records;
-        this.BytesOfRecords = records.length;
+        this.bytesOfRecords = records.length;
         this.sizeOfIns=sizeOfIns;
-        if (sizeOfIns<BytesOfRecords){
+        if (sizeOfIns<bytesOfRecords){
             System.out.println("Overflow");
         }
     }
@@ -22,7 +22,7 @@ public class DataPage{
 
     @Override
     public String toString(){
-        return ("numOfRecords :"+this.BytesOfRecords+" record 1: "+records[0].toString());
+        return ("numOfRecords :"+this.bytesOfRecords+" record 1: "+records[0].toString());
     }
 
     public byte[] convertToByte(){
@@ -61,9 +61,22 @@ public class DataPage{
         return new DataPage(dcArr, sizeOfRec);
         
     }
+
+    public static DataClass searchKeyInPage(DataPage[] dpArr, int key, int insSize){
+        for (int j=0; j<dpArr.length; j++){
+            if(dpArr[j]!=null){
+                for (int i=0; i < dpArr[j].getBytesOfRecords(); i++){
+                    if (dpArr[j].getRecords()[i]!=null && dpArr[j].getRecords()[i].getKey()==key){
+                        return dpArr[j].getRecords()[i];
+                    }
+                }
+            }
+        }
+        return null;
+    }
     
     public void setBytesOfRecords(int bytesOfRecords) {
-        BytesOfRecords = bytesOfRecords;
+        bytesOfRecords = bytesOfRecords;
     }
 
     public void setRecords(DataClass[] records) {
@@ -79,7 +92,7 @@ public class DataPage{
     }
 
     public int getBytesOfRecords(){
-        return this.BytesOfRecords;
+        return this.bytesOfRecords;
     }
 
 }

@@ -109,6 +109,45 @@ public class FileHandling {
 		}		
 	} 
 
+	public static int searchKeyFile(String filename, int insSize, int key){
+		try (RandomAccessFile file = new RandomAccessFile(filename, "r")) {
+			int fileSize = (int) file.length(); //multiple of page size
+			int maxInstances = (int) ((double)PAGE_SIZE/insSize); //max num of instaces
+ 			int numOfPages = fileSize/PAGE_SIZE; //num of pages written in the file
+			int seekPos=0; //our cursor position for reading  purposes
+			byte[] buffer = new byte[insSize]; //in this buffer we read the page and then modification takes in
+			ByteBuffer bb = ByteBuffer.wrap(buffer);
+			DataPage[] dpArr = new DataPage[numOfPages];
+
+			file.seek(fileSize-4);
+			int recsToRead = file.readInt(); //recs we want to read given from file at 4 last bytes
+
+			DataClass[] dcArr = new DataClass[recsToRead];
+			file.seek(0);//we are going to read from the beggining
+			int curPage = (maxInstances*insSize);
+			for (int i=0; i<numOfPages; i++){
+				file.seek((i*PAGE_SIZE)+curPage);
+				int recsInPage=file.readInt();
+				//System.out.println(recsInPage);
+				for (int j=0; j<recsInPage;j++){
+					file.seek(seekPos);
+					file.read(buffer);
+					dcArr[j]=DataClass.convertToObj(buffer, insSize);
+					//System.out.println("DEBUG readPages: "+dcArr[j].toString()+" seekPos: "+seekPos);
+					seekPos+=insSize;
+					if(dcArr[j].getKey()==key)
+						return i;//index of page
+				}
+				seekPos=(i+1)*PAGE_SIZE;
+			}
+			return -1;
+
+			}catch (IOException e) { //case something wrong happens with our file
+				System.out.println("File errror!!!");
+				return -1;
+			}	
+		}
+
 	//creates a page to write
 	public byte[] createPage(DataClass[] dcArr, int sizeIns){
 		return (new DataPage(dcArr, sizeIns)).convertToByte();

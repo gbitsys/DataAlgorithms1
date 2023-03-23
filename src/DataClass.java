@@ -1,6 +1,6 @@
 import java.nio.ByteBuffer;
 
-public class DataClass implements Comparable{
+public class DataClass{
 	
 	private int key;//size 4 bytes
 	private String dataStr;
@@ -18,11 +18,6 @@ public class DataClass implements Comparable{
 	//a method that generates our 'random' ascii string for dataStr
 	private String randomGen(int size) {
 		return(RandomGenerator.generateASCII(size));
-	}
-
-	@Override
-	public int compareTo(Object o) {
-		return 0;
 	}
 
 	@Override
