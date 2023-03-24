@@ -46,8 +46,7 @@ public class RandomGenerator {
 	// a method that generates an array of unique random integers
 	public static int[] generateUniqInts(int numOfKeys, int minKey, int maxKey){
 		Random rg = new java.util.Random();
-		int[] randomInts = rg.ints(minKey,
-		maxKey+1).distinct().limit(numOfKeys).toArray();
+		int[] randomInts = rg.ints(minKey,maxKey+1).distinct().limit(numOfKeys).toArray();
 
 		return randomInts;
 	}

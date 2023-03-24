@@ -1,25 +1,15 @@
 import java.io.*;
-import java.lang.module.ModuleDescriptor.Builder;
 import java.nio.*;
-import java.util.ArrayList;
-import java.util.*;
 
 
 
 public class FileHandling {
 	
-	private String fName="file1"; 
+	
 	private static final int PAGE_SIZE=256;
-	
-	private static final int REC_SIZEA=59;
-	private static final int DATA_SIZEA=55;
-	private static final int KEY_SIZE=4;
-	
-	private static final int REC_SIZEB=31;
 	//private static final int INDEX_SIZE;
 	
-	public FileHandling(String fileName) {
-		this.fName = fileName;
+	public FileHandling() {
 	}
 
 	public static int writePage(DataClass[] dcInstances, String fName, int sizeOfIns) {
@@ -78,7 +68,6 @@ public class FileHandling {
  			int numOfPages = fileSize/PAGE_SIZE; //num of pages written in the file
 			int seekPos=0; //our cursor position for reading  purposes
 			byte[] buffer = new byte[insSize]; //in this buffer we read the page and then modification takes in
-			ByteBuffer bb = ByteBuffer.wrap(buffer);
 			DataPage[] dpArr = new DataPage[numOfPages];
 
 			file.seek(fileSize-4);
@@ -116,8 +105,6 @@ public class FileHandling {
  			int numOfPages = fileSize/PAGE_SIZE; //num of pages written in the file
 			int seekPos=0; //our cursor position for reading  purposes
 			byte[] buffer = new byte[insSize]; //in this buffer we read the page and then modification takes in
-			ByteBuffer bb = ByteBuffer.wrap(buffer);
-			DataPage[] dpArr = new DataPage[numOfPages];
 
 			file.seek(fileSize-4);
 			int recsToRead = file.readInt(); //recs we want to read given from file at 4 last bytes
@@ -125,9 +112,12 @@ public class FileHandling {
 			DataClass[] dcArr = new DataClass[recsToRead];
 			file.seek(0);//we are going to read from the beggining
 			int curPage = (maxInstances*insSize);
+
+			MultiCounter.resetCounter(1); //reset counter for "disk accesses"
 			for (int i=0; i<numOfPages; i++){
 				file.seek((i*PAGE_SIZE)+curPage);
 				int recsInPage=file.readInt();
+				MultiCounter.increaseCounter(1);//increase counter to measure "disk accesses"
 				//System.out.println(recsInPage);
 				for (int j=0; j<recsInPage;j++){
 					file.seek(seekPos);
@@ -152,5 +142,55 @@ public class FileHandling {
 	public byte[] createPage(DataClass[] dcArr, int sizeIns){
 		return (new DataPage(dcArr, sizeIns)).convertToByte();
 		
+	}
+	public static KeyPage[] writePageKp(DataClass[] dcInstances, String fName, int sizeOfIns) {
+
+
+		try (RandomAccessFile file = new RandomAccessFile(fName, "rws")) {
+			int lengthOf = dcInstances.length;
+			int numOfBytes = lengthOf*sizeOfIns;
+			int toWrite = (int) Math.ceil((double)numOfBytes/PAGE_SIZE); //how many pages we want
+			ByteBuffer bb = ByteBuffer.allocate(PAGE_SIZE);
+			int numOfInstances = (int) ((double)PAGE_SIZE/sizeOfIns); //for grouping instances
+			KeyPage[] kpArr = new KeyPage[dcInstances.length]; //for key page file
+			file.setLength((toWrite+4));
+			int i=0;
+			int j=0;
+			//System.out.println("DEBUG: "+numOfBytes + " " + numOfInstances);//DEBUG
+			for(int p=0; p<toWrite; p++){
+				bb.clear();
+				DataClass[] insToWrite = new DataClass[numOfInstances];
+				while (i<lengthOf && (numOfInstances-j)>0){
+					insToWrite[j]=dcInstances[i];
+					kpArr[i] = new KeyPage(dcInstances[i].getKey(), p);
+					j++;
+					i++;
+				}
+				
+				//System.out.println();
+				DataPage dWrite = new DataPage(insToWrite, sizeOfIns);
+				bb.put(dWrite.convertToByte(),0,(numOfInstances*sizeOfIns)-4);
+				bb.putInt(numOfInstances * sizeOfIns,j);
+				j=0;
+				/*try{
+					bb.putInt(PAGE_SIZE-4,dWrite.getNumOfRecords());
+				}catch(Exception e){
+
+				}*/
+
+				file.write(bb.array());
+			}
+			//System.out.println("DEBUG write file bytes: "+file.length());
+			int fileBytes = (int)file.length();
+			file.seek(fileBytes-4);
+			file.writeInt(lengthOf);
+			file.close();
+			return kpArr;
+			
+		} catch (IOException e) { //case something wrong happens with our file
+			System.out.println("File errror!!!");
+			e.printStackTrace();
+			return null;
+		}
 	}
 }
