@@ -54,7 +54,7 @@ public class MultiCounter {
 	 */
 	public static boolean increaseCounter(int counterIndex, int step) {
 		if (counterIndex-1 < counters.length)
-			counters[counterIndex] = counters[counterIndex-1] + step;
+			counters[counterIndex-1] = counters[counterIndex-1] + step;
 		return true;
 	}
 }

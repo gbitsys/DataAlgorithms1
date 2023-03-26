@@ -48,14 +48,15 @@ public class KeyPage implements Comparable{
     
     public static void writeKpFile(KeyPage[] kpArr, String fName){
         try (RandomAccessFile file = new RandomAccessFile(fName, "rws")) {
-            int toWrite = (int) Math.ceil((double)kpArr.length*8/256);
             int numOfInstances = (int) ((double)256/8); //for grouping instances
+            int toWrite = (int) Math.ceil((double)kpArr.length/32);
+            
             //indices
             int arrIndex = 0;
             int pageIndex = 0;
     
             ByteBuffer bb = ByteBuffer.allocate(256);
-            while(pageIndex < toWrite && arrIndex < numOfInstances){
+            while(pageIndex < toWrite && arrIndex < kpArr.length){
                 if(bb.remaining()<8){ //checking if page is written
                     bb.clear();
                     file.write(bb.array());
@@ -67,7 +68,9 @@ public class KeyPage implements Comparable{
                 arrIndex++;
             }
 
-            if (MultiCounter.getCount(2)<toWrite)
+            if (arrIndex==kpArr.length && bb.remaining()>0){
+                bb.put(new byte[bb.remaining()]);
+            }
                 file.write(bb.array());
             
                 MultiCounter.resetCounter(2);
@@ -78,5 +81,43 @@ public class KeyPage implements Comparable{
             System.out.println("file error!!!");
         }
 
+    }
+
+
+    /**
+     * @param fName
+     * @param keySearch
+     * @param numOfPairs
+     * @return -1: key not found, positive int: key position in page
+     */
+    public static int searchKeyPage(String fName, int keySearch, int numOfPairs){
+        try (RandomAccessFile file = new RandomAccessFile(fName, "rws")) {
+            byte[] buffer = new byte[8];
+            int pairIndex = 0;
+            int pairIndexTotal = 0;
+            long fileSize = file.length();
+            int key = -1;
+            int numOfPage = -1;
+            long seekPos = 0;
+            for (long i=0; i < fileSize; i+=256){
+                file.seek(seekPos*i);
+                while(pairIndexTotal<numOfPairs && pairIndex<32){
+                    file.read(buffer);
+                    KeyPage kp = KeyPage.convertBytesToKp(buffer);
+                    key = kp.getKey();
+                    numOfPage = kp.getNumOfPage();
+                    pairIndex++;
+                    if (key == keySearch)
+                    return numOfPage;
+                }
+                pairIndex=0;
+                seekPos=i+1;
+            }
+            return -1;
+        } catch (Exception e) {
+            // TODO: handle exception
+            System.out.println("File error!!!");
+            return -1;
+        }
     }
 }
