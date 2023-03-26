@@ -27,7 +27,7 @@ public class DataPage{
 
     public byte[] convertToByte(){
         ByteBuffer bb = java.nio.ByteBuffer.allocate(this.sizeBytes);
-        byte[] bf = new byte[256];
+        byte[] bf = new byte[sizeBytes];
         bb.put(bf);
         bb.rewind();
         int numOfInstances = 0;

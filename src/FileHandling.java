@@ -26,7 +26,6 @@ public class FileHandling {
 			int i=0;
 			int j=0;
 			//System.out.println("DEBUG: "+numOfBytes + " " + numOfInstances);//DEBUG
-			
 			for(int p=0; p<toWrite; p++){
 				bb.clear();
 				DataClass[] insToWrite = new DataClass[numOfInstances];
@@ -118,11 +117,11 @@ public class FileHandling {
 			int i=0;
 			int j=0;
 			//System.out.println("DEBUG: "+numOfBytes + " " + numOfInstances);//DEBUG
-			MultiCounter.resetCounter(3); //reset our counter for page writting
+			
 			for(int p=0; p<toWrite; p++){
 				bb.clear();
 				DataClass[] insToWrite = new DataClass[numOfInstances];
-				MultiCounter.increaseCounter(3);
+				
 				while (i<lengthOf && (numOfInstances-j)>0){
 					insToWrite[j]=dcInstances[i];
 					kpArr[i] = new KeyPage(dcInstances[i].getKey(), p);
@@ -135,11 +134,6 @@ public class FileHandling {
 				bb.put(dWrite.convertToByte(),0,(numOfInstances*sizeOfIns)-4);
 				bb.putInt(numOfInstances * sizeOfIns,j);
 				j=0;
-				/*try{
-					bb.putInt(PAGE_SIZE-4,dWrite.getNumOfRecords());
-				}catch(Exception e){
-
-				}*/
 
 				file.write(bb.array());
 			}
@@ -153,6 +147,33 @@ public class FileHandling {
 		} catch (IOException e) { //case something wrong happens with our file
 			System.out.println("File errror!!!");
 			e.printStackTrace();
+			return null;
+		}
+	}
+
+	public static DataClass bRoadFind(String fName, int pageNum, int recSize,int searchKey){
+		if (pageNum < 0){
+			return null;
+		}
+		try (RandomAccessFile file = new RandomAccessFile(fName, "rws")) {
+			int numOfInstances = (int) ((double)PAGE_SIZE/recSize); //for grouping instances
+			byte[] buffer = new byte[recSize];
+			long filePos = PAGE_SIZE*pageNum;
+			file.seek(filePos);
+			MultiCounter.resetCounter(3);
+			MultiCounter.increaseCounter(3);
+			for (int i=0; i < numOfInstances; i++){
+				file.read(buffer);
+				DataClass dc = DataClass.convertToObj(buffer, recSize);
+				int key = dc.getKey();
+				if (key==searchKey){
+					return dc;
+				}
+				filePos+=recSize;
+			}
+			return null;
+		} catch (Exception e) {
+			System.out.println("File error!!!");
 			return null;
 		}
 	}

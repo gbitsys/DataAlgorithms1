@@ -99,8 +99,10 @@ public class KeyPage implements Comparable{
             int key = -1;
             int numOfPage = -1;
             long seekPos = 0;
+            MultiCounter.resetCounter(2);
             for (long i=0; i < fileSize; i+=256){
                 file.seek(seekPos*i);
+                MultiCounter.increaseCounter(2);
                 while(pairIndexTotal<numOfPairs && pairIndex<32){
                     file.read(buffer);
                     KeyPage kp = KeyPage.convertBytesToKp(buffer);
