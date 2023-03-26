@@ -59,8 +59,7 @@ public class KeyPage implements Comparable{
             while(pageIndex < toWrite && arrIndex < kpArr.length){
                 if(bb.remaining()<8){ //checking if page is written
                     bb.clear();
-                    file.write(bb.array());
-                    MultiCounter.increaseCounter(2);
+                    file.write(bb.array());          
                     pageIndex++;
                 }
                 bb.putInt(kpArr[arrIndex].getKey());
@@ -72,9 +71,6 @@ public class KeyPage implements Comparable{
                 bb.put(new byte[bb.remaining()]);
             }
                 file.write(bb.array());
-            
-                MultiCounter.resetCounter(2);
-                MultiCounter.increaseCounter(2, toWrite);
                 file.close();
             
         } catch (Exception e) {
@@ -109,8 +105,9 @@ public class KeyPage implements Comparable{
                     key = kp.getKey();
                     numOfPage = kp.getNumOfPage();
                     pairIndex++;
-                    if (key == keySearch)
-                    return numOfPage;
+                    if (key == keySearch){
+                        return numOfPage;
+                    }
                 }
                 pairIndex=0;
                 seekPos=i+1;

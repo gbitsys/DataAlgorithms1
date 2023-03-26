@@ -43,7 +43,6 @@ public class FileHandling {
 				
 				file.write(bb.array());
 			}
-			System.out.println("DEBUG i:"+i);
 			long fileBytes = file.length();
 			file.seek(fileBytes-4);
 			file.writeInt(lengthOf);
@@ -116,7 +115,6 @@ public class FileHandling {
 			file.setLength((toWrite+4));
 			int i=0;
 			int j=0;
-			//System.out.println("DEBUG: "+numOfBytes + " " + numOfInstances);//DEBUG
 			
 			for(int p=0; p<toWrite; p++){
 				bb.clear();
@@ -129,7 +127,7 @@ public class FileHandling {
 					i++;
 				}
 				
-				//System.out.println();
+				
 				DataPage dWrite = new DataPage(insToWrite, sizeOfIns);
 				bb.put(dWrite.convertToByte(),0,(numOfInstances*sizeOfIns)-4);
 				bb.putInt(numOfInstances * sizeOfIns,j);
@@ -137,11 +135,11 @@ public class FileHandling {
 
 				file.write(bb.array());
 			}
-			//System.out.println("DEBUG write file bytes: "+file.length());
 			long fileBytes = file.length();
 			file.seek(fileBytes-4);
 			file.writeInt(lengthOf);
 			file.close();
+			
 			return kpArr;
 			
 		} catch (IOException e) { //case something wrong happens with our file
@@ -162,6 +160,7 @@ public class FileHandling {
 			file.seek(filePos);
 			MultiCounter.resetCounter(3);
 			MultiCounter.increaseCounter(3);
+			
 			for (int i=0; i < numOfInstances; i++){
 				file.read(buffer);
 				DataClass dc = DataClass.convertToObj(buffer, recSize);

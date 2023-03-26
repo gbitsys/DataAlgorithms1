@@ -61,19 +61,6 @@ public class DataPage{
         return new DataPage(dcArr, sizeOfRec);
         
     }
-
-    public static DataClass searchKeyInPage(DataPage[] dpArr, int key, int insSize){
-        for (int j=0; j<dpArr.length; j++){
-            if(dpArr[j]!=null){
-                for (int i=0; i < dpArr[j].getBytesOfRecords(); i++){
-                    if (dpArr[j].getRecords()[i]!=null && dpArr[j].getRecords()[i].getKey()==key){
-                        return dpArr[j].getRecords()[i];
-                    }
-                }
-            }
-        }
-        return null;
-    }
     
     public void setBytesOfRecords(int bytesOfRecords) {
         bytesOfRecords = bytesOfRecords;
