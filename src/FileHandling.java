@@ -70,7 +70,7 @@ public class FileHandling {
 			DataClass[] dcArr = new DataClass[recsToRead];
 			file.seek(0);//we are going to read from the beggining
 			int curPage = (maxInstances*insSize);
-
+			//System.out.println("PAGES: "+numOfPages);
 			MultiCounter.resetCounter(1); //reset counter for "disk accesses"
 			for (int i=0; i<numOfPages; i++){
 				file.seek((i*PAGE_SIZE)+curPage);
@@ -158,18 +158,18 @@ public class FileHandling {
 			byte[] buffer = new byte[recSize];
 			long filePos = PAGE_SIZE*pageNum;
 			file.seek(filePos);
-			MultiCounter.resetCounter(3);
-			MultiCounter.increaseCounter(3);
 			
 			for (int i=0; i < numOfInstances; i++){
 				file.read(buffer);
 				DataClass dc = DataClass.convertToObj(buffer, recSize);
 				int key = dc.getKey();
 				if (key==searchKey){
+					file.close();
 					return dc;
 				}
 				filePos+=recSize;
 			}
+			file.close();
 			return null;
 		} catch (Exception e) {
 			System.out.println("File error!!!");

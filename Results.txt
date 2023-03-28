@@ -1,0 +1,52 @@
+............SIZE A (A).............
+Instances num: 50	Search time: 75088.208	Disk accesses: 9.535
+Instances num: 100	Search time: 104137.53	Disk accesses: 19.014
+Instances num: 200	Search time: 187496.86	Disk accesses: 37.652
+Instances num: 500	Search time: 478846.504	Disk accesses: 94.488
+Instances num: 800	Search time: 733740.24	Disk accesses: 150.876
+Instances num: 1000	Search time: 909026.672	Disk accesses: 189.694
+Instances num: 2000	Search time: 1796353.444	Disk accesses: 371.85
+Instances num: 5000	Search time: 4551744.22	Disk accesses: 936.894
+Instances num: 10000	Search time: 8986849.528	Disk accesses: 1867.378
+Instances num: 50000	Search time: 4.5397154492E7	Disk accesses: 9311.844
+Instances num: 100000	Search time: 9.1704220772E7	Disk accesses: 18714.127
+Instances num: 200000	Search time: 1.91714011924E8	Disk accesses: 38485.996
+............SIZE B (A).............
+Instances num: 50	Search time: 43015.572	Disk accesses: 5.353
+Instances num: 100	Search time: 75110.596	Disk accesses: 9.723
+Instances num: 200	Search time: 145902.312	Disk accesses: 18.714
+Instances num: 500	Search time: 364644.116	Disk accesses: 47.904
+Instances num: 800	Search time: 590140.362	Disk accesses: 74.982
+Instances num: 1000	Search time: 729701.564	Disk accesses: 95.201
+Instances num: 2000	Search time: 1482792.368	Disk accesses: 188.327
+Instances num: 5000	Search time: 3574609.136	Disk accesses: 463.519
+Instances num: 10000	Search time: 7378221.77	Disk accesses: 961.843
+Instances num: 50000	Search time: 3.5969522044E7	Disk accesses: 4664.027
+Instances num: 100000	Search time: 7.2953304944E7	Disk accesses: 9415.59
+Instances num: 200000	Search time: 1.4718737786E8	Disk accesses: 18742.152
+............SIZE A (B).............
+Instances num: 50	Search time: 32237.996	Disk accesses: 2.672
+Instances num: 100	Search time: 47289.65	Disk accesses: 4.224
+Instances num: 200	Search time: 73690.052	Disk accesses: 7.169
+Instances num: 500	Search time: 176496.56	Disk accesses: 16.034
+Instances num: 800	Search time: 258281.868	Disk accesses: 25.202
+Instances num: 1000	Search time: 326603.798	Disk accesses: 32.18
+Instances num: 2000	Search time: 641803.27	Disk accesses: 63.019
+Instances num: 5000	Search time: 1626608.254	Disk accesses: 156.755
+Instances num: 10000	Search time: 3208000.402	Disk accesses: 313.377
+Instances num: 50000	Search time: 1.5763221756E7	Disk accesses: 1564.0
+Instances num: 100000	Search time: 3.259669444E7	Disk accesses: 3119.754
+Instances num: 200000	Search time: 6.294913532E7	Disk accesses: 6244.754
+............SIZE B (B).............
+Instances num: 50	Search time: 27132.794	Disk accesses: 2.676
+Instances num: 100	Search time: 48291.174	Disk accesses: 4.246
+Instances num: 200	Search time: 70185.458	Disk accesses: 7.006
+Instances num: 500	Search time: 167510.294	Disk accesses: 16.217
+Instances num: 800	Search time: 267570.712	Disk accesses: 24.94
+Instances num: 1000	Search time: 326197.1	Disk accesses: 32.145
+Instances num: 2000	Search time: 670075.112	Disk accesses: 63.324
+Instances num: 5000	Search time: 1595556.104	Disk accesses: 156.757
+Instances num: 10000	Search time: 3202556.976	Disk accesses: 314.0
+Instances num: 50000	Search time: 1.5811823908E7	Disk accesses: 1564.0
+Instances num: 100000	Search time: 3.1581257246E7	Disk accesses: 3126.0
+Instances num: 200000	Search time: 6.4860838828E7	Disk accesses: 6244.756

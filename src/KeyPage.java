@@ -1,5 +1,6 @@
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
 
 public class KeyPage implements Comparable{
     private int key;
@@ -16,7 +17,16 @@ public class KeyPage implements Comparable{
 
     @Override
     public int compareTo(Object arg0) {
-        throw new UnsupportedOperationException("Unimplemented method 'compareTo'");
+        KeyPage kp = (KeyPage) arg0;
+        if (this.getKey()>kp.getKey()){
+            return 1;
+        }
+        if (this.getKey()<kp.getKey()){
+            return -1;
+        }
+        else { //unreachable
+            return 0;
+        }
     }
     public int getKey() {
         return key;
@@ -26,6 +36,77 @@ public class KeyPage implements Comparable{
     }
     public int getNumOfPage() {
         return numOfPage;
+    }
+
+    public static int binarySearch(String fName, int keySearch, int numOfPairs){
+        try (RandomAccessFile file = new RandomAccessFile(fName, "rws")) {
+            int fileSize =(int)Math.ceil((double)numOfPairs/32)*256;//total bytes 
+            //lowest page
+            int low = 0;
+
+            //highest page
+            int high = (fileSize/256)-1;
+            int key=-1;
+            int numOfPage=-1;
+            String index="0";
+            byte[] buffer = new byte[8];
+            int prevMid = -1;
+            MultiCounter.resetCounter(5); //reset out counter
+            while(low<=high){
+                int mid = (int)Math.floor(low + (((double)high - low) / 2));
+                file.seek(mid*256);
+                MultiCounter.increaseCounter(5);
+                int prevKey=-1;
+                for (int i=0; i<32; i++){
+                    file.read(buffer); //our instance
+                    
+                    KeyPage kp = KeyPage.convertBytesToKp(buffer);
+                    key = kp.getKey();
+                    numOfPage = kp.getNumOfPage();
+                    if (key == keySearch && prevKey != key){
+                        file.close();
+                        return numOfPage;
+                    }
+                    if ((prevKey > keySearch && prevKey > key) || (key > keySearch && i==31)){
+                        index = "lower"; //where to search
+                        high = mid - 1;
+                        break;
+                    }
+                    if ((prevKey < keySearch && prevKey > key) ||(key < keySearch && i==31)){
+                        index = "higher"; //where to search
+                        low = mid + 1;
+                        break;
+                    }
+                    if ((i==31 && low==high) || mid==prevMid){
+                        return -1;
+                    }
+                    prevKey=key;
+                }
+                prevMid = mid;
+            }
+            file.close();
+            return -1;
+
+            /*while (low <= high) {
+                int mid = low  + ((high - low) / 2);
+                if (sortedArray[mid] < key) {
+                    low = mid + 1;
+                } else if (sortedArray[mid] > key) {
+                    high = mid - 1;
+                } else if (sortedArray[mid] == key) {
+                    index = mid;
+                    break;
+                }
+            }
+            return index;*/
+
+
+        } catch (Exception e) {
+            // TODO: handle exception
+            System.out.println("File error!!! binarySearch");
+           // e.printStackTrace();
+            return -1;
+        }
     }
 
     public void setNumOfPage(int numOfPage) {
@@ -50,11 +131,11 @@ public class KeyPage implements Comparable{
         try (RandomAccessFile file = new RandomAccessFile(fName, "rws")) {
             int numOfInstances = (int) ((double)256/8); //for grouping instances
             int toWrite = (int) Math.ceil((double)kpArr.length/32);
-            
+
             //indices
             int arrIndex = 0;
             int pageIndex = 0;
-    
+            file.setLength(toWrite*256);
             ByteBuffer bb = ByteBuffer.allocate(256);
             while(pageIndex < toWrite && arrIndex < kpArr.length){
                 if(bb.remaining()<8){ //checking if page is written
@@ -91,7 +172,8 @@ public class KeyPage implements Comparable{
             byte[] buffer = new byte[8];
             int pairIndex = 0;
             int pairIndexTotal = 0;
-            long fileSize = file.length();
+            int fileSize =(int)Math.ceil((double)numOfPairs/32)*256;
+
             int key = -1;
             int numOfPage = -1;
             long seekPos = 0;
@@ -105,7 +187,9 @@ public class KeyPage implements Comparable{
                     key = kp.getKey();
                     numOfPage = kp.getNumOfPage();
                     pairIndex++;
+                    pairIndexTotal++;
                     if (key == keySearch){
+                        file.close();
                         return numOfPage;
                     }
                 }
