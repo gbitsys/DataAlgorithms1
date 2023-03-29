@@ -159,11 +159,14 @@ public class FileHandling {
 			long filePos = PAGE_SIZE*pageNum;
 			file.seek(filePos);
 			
+			MultiCounter.resetCounter(7);
 			for (int i=0; i < numOfInstances; i++){
 				file.read(buffer);
 				DataClass dc = DataClass.convertToObj(buffer, recSize);
 				int key = dc.getKey();
+				
 				if (key==searchKey){
+					MultiCounter.increaseCounter(7);
 					file.close();
 					return dc;
 				}

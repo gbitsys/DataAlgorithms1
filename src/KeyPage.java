@@ -40,67 +40,45 @@ public class KeyPage implements Comparable{
 
     public static int binarySearch(String fName, int keySearch, int numOfPairs){
         try (RandomAccessFile file = new RandomAccessFile(fName, "rws")) {
-            int fileSize =(int)Math.ceil((double)numOfPairs/32)*256;//total bytes 
+            int fileSize =(int)Math.ceil((double)numOfPairs/32);//total pages 
             //lowest page
             int low = 0;
 
             //highest page
-            int high = (fileSize/256)-1;
-            int key=-1;
-            int numOfPage=-1;
-            String index="0";
+            int high = (fileSize)-1;
+            int mid = low + (high - low) / 2; 
+
+            int prevKey = -1;
+            int key = -1;
+            int numOfPage = -1;
+            String index = "0";
             byte[] buffer = new byte[8];
-            int prevMid = -1;
             MultiCounter.resetCounter(5); //reset out counter
-            while(low<=high){
-                int mid = (int)Math.floor(low + (((double)high - low) / 2));
+
+            while (low <= high){
                 file.seek(mid*256);
                 MultiCounter.increaseCounter(5);
-                int prevKey=-1;
-                for (int i=0; i<32; i++){
-                    file.read(buffer); //our instance
-                    
+                for (int pair = 0; pair < 32; pair++){
+                    file.read(buffer);
                     KeyPage kp = KeyPage.convertBytesToKp(buffer);
-                    key = kp.getKey();
+                     key = kp.getKey();
                     numOfPage = kp.getNumOfPage();
-                    if (key == keySearch && prevKey != key){
+
+                    if (key==keySearch && prevKey != key){
                         file.close();
                         return numOfPage;
                     }
-                    if ((prevKey > keySearch && prevKey > key) || (key > keySearch && i==31)){
-                        index = "lower"; //where to search
-                        high = mid - 1;
-                        break;
-                    }
-                    if ((prevKey < keySearch && prevKey > key) ||(key < keySearch && i==31)){
-                        index = "higher"; //where to search
-                        low = mid + 1;
-                        break;
-                    }
-                    if ((i==31 && low==high) || mid==prevMid){
-                        return -1;
-                    }
-                    prevKey=key;
+                    if (prevKey < key) prevKey = key;
                 }
-                prevMid = mid;
+
+                if (prevKey < keySearch || (key < keySearch && key != prevKey)) low = mid + 1; //we need to search "higher" 
+                else if (prevKey > keySearch || (key > keySearch && key != prevKey)) high = mid - 1; //we need to search "lower"
+
+                mid = low + (high - low) / 2;
             }
+
             file.close();
-            return -1;
-
-            /*while (low <= high) {
-                int mid = low  + ((high - low) / 2);
-                if (sortedArray[mid] < key) {
-                    low = mid + 1;
-                } else if (sortedArray[mid] > key) {
-                    high = mid - 1;
-                } else if (sortedArray[mid] == key) {
-                    index = mid;
-                    break;
-                }
-            }
-            return index;*/
-
-
+            return -1; //key not found (low > high)
         } catch (Exception e) {
             // TODO: handle exception
             System.out.println("File error!!! binarySearch");
@@ -173,12 +151,12 @@ public class KeyPage implements Comparable{
             int pairIndex = 0;
             int pairIndexTotal = 0;
             int fileSize =(int)Math.ceil((double)numOfPairs/32)*256;
-
+            int toRead  = (int) Math.ceil((double)numOfPairs/32);
             int key = -1;
             int numOfPage = -1;
             long seekPos = 0;
             MultiCounter.resetCounter(2);
-            for (long i=0; i < fileSize; i+=256){
+            for (long i=0; i < toRead; i++){
                 file.seek(seekPos*i);
                 MultiCounter.increaseCounter(2);
                 while(pairIndexTotal<numOfPairs && pairIndex<32){
@@ -194,7 +172,7 @@ public class KeyPage implements Comparable{
                     }
                 }
                 pairIndex=0;
-                seekPos=i+1;
+                seekPos=256;
             }
             return -1;
         } catch (Exception e) {

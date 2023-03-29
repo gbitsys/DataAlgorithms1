@@ -8,8 +8,8 @@ public class MainClass {
 	private static final int DATA_SIZEB=27;
 
 	public static void main(String[] args) {
-		aRoad();
-		bRoad();
+		//aRoad();
+		//bRoad();
 		cRoad();
 	}
 
@@ -28,7 +28,7 @@ public class MainClass {
 	}
 
 	public static void aRoad(){
-		int instancesNum [] = {50, 100, 200, 500, 800, 1000, 2000, 5000,10000, 50000, 100000, 200000};
+		int instancesNum [] = {50, 100, 200, 500, 800};//, 1000, 2000, 5000,10000, 50000, 100000, 200000};
 		int diskAccesses [] = new int[instancesNum.length];
 		double[] timeStart = new double[instancesNum.length];
 		double[] timeEnd = new double[instancesNum.length];
@@ -51,7 +51,7 @@ public class MainClass {
 			System.out.println("Instances num: "+instancesNum[i]+"\tSearch time: "+(timeEnd[i]-timeStart[i])/1000+"\tDisk accesses: "+diskAccesses[i]/(double)1000);
 		}
  
-		int instancesNum2 [] = {50, 100, 200, 500, 800, 1000, 2000, 5000,10000, 50000, 100000, 200000}; 
+		int instancesNum2 [] = {50, 100, 200, 500, 800};//, 1000, 2000, 5000,10000, 50000, 100000, 200000}; 
 		int diskAccesses2 [] = new int[instancesNum2.length];
 		double[] timeStart2 = new double[instancesNum2.length];
 		double[] timeEnd2 = new double[instancesNum2.length];
@@ -131,10 +131,13 @@ public class MainClass {
 	}
 
 	public static void cRoad(){
-		int instancesNum [] = {50, 100, 200, 500, 800, 1000, 2000, 5000,10000, 50000, 100000, 200000};
+		int found = 0;
+		int found2 = 0;
+		int instancesNum [] = {50, 100, 200, 500};// 
 		int diskAccesses [] = new int[instancesNum.length];
 		double[] timeStart = new double[instancesNum.length];
 		double[] timeEnd = new double[instancesNum.length];
+		
 		String fileNamePages = "file3-a.bin";
 		String fileNameKeys = "file3-Keysb.bin";
 		System.out.println("............SIZE A (C).............");
@@ -148,16 +151,31 @@ public class MainClass {
 			for(int j=0; j<keysSearch.length; j++){
 				timeStart[i] += System.nanoTime();	
 				int pageNum = KeyPage.binarySearch(fileNameKeys, keysSearch[j], dcArr.length);
+				if (pageNum >= 0 ){
+					MultiCounter.increaseCounter(10);
+					diskAccesses[i]+=1;
+				}
+				int pageNum2 = KeyPage.searchKeyPage(fileNameKeys, keysSearch[j], dcArr.length);
+				if (pageNum2 >= 0){
+					MultiCounter.increaseCounter(9);
+				}
+				
+				if (pageNum != pageNum2){
+					System.out.println("DEBUG main c: pageNum: "+pageNum+" pageNum2: "+pageNum2+" key:"+keysSearch[j]+" numOf: "+ instancesNum[i]);
+				}
+
 				diskAccesses[i]+=(int)MultiCounter.getCount(5); 	
 				timeEnd[i]+=System.nanoTime();
 			}
 		}
+		System.out.println("found1: "+MultiCounter.getCount(10)+ " found2: "+MultiCounter.getCount(9) );
+
 
 		for (int i=0; i<instancesNum.length; i++){
 			System.out.println("Instances num: "+instancesNum[i]+"\tSearch time: "+(timeEnd[i]-timeStart[i])/1000+"\tDisk accesses: "+diskAccesses[i]/(double)1000);
 		}
-
-		int instancesNum2 [] = {50, 100, 200, 500, 800, 1000, 2000, 5000,10000, 50000, 100000, 200000}; 
+/* 
+		int instancesNum2 [] = {50, 100, 200, 500, 800};//, 1000, 2000, 5000,10000, 50000, 100000, 200000}; 
 		int diskAccesses2 [] = new int[instancesNum.length];
 		double[] timeStart2 = new double[instancesNum.length];
 		double[] timeEnd2 = new double[instancesNum.length];
@@ -181,6 +199,6 @@ public class MainClass {
 
 		for (int i=0; i<instancesNum2.length; i++){
 			System.out.println("Instances num: "+instancesNum2[i]+"\tSearch time: "+(timeEnd2[i]-timeStart2[i])/1000+"\tDisk accesses: "+diskAccesses2[i]/(double)1000);
-		}
+		}*/
 	}
 }
